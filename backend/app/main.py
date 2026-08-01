@@ -13,6 +13,7 @@ from app.api.powerplay import router as powerplay_router
 from app.api.extras_breakdown import router as extras_breakdown_router
 from app.api.analytics.stats import router as analytics_router
 from app.api.scorecard import router as scorecard_router
+from app.api.player_profile import router as player_profile_router
 
 app = FastAPI(
     title="CricketIQ AI",
@@ -41,6 +42,7 @@ app.include_router(powerplay_router)
 app.include_router(extras_breakdown_router)
 app.include_router(analytics_router)
 app.include_router(scorecard_router)
+app.include_router(player_profile_router)
 
 @app.get("/")
 def home():

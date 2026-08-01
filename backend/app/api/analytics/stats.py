@@ -41,3 +41,19 @@ def top_bowlers(db: Session = Depends(get_db)):
     result = db.execute(query)
 
     return [dict(row._mapping) for row in result]
+
+@router.get("/dashboard")
+def dashboard(db: Session = Depends(get_db)):
+    query = text("""
+        SELECT
+            (SELECT COUNT(*) FROM matches) AS matches,
+            (SELECT COUNT(*) FROM players) AS players,
+            (SELECT COUNT(*) FROM teams) AS teams,
+            (SELECT COUNT(*) FROM venues) AS venues,
+            (SELECT COUNT(*) FROM deliveries) AS deliveries,
+            (SELECT COUNT(*) FROM wickets) AS wickets
+    """)
+
+    result = db.execute(query).first()
+
+    return dict(result._mapping)
