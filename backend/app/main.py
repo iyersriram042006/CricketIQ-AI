@@ -1,3 +1,4 @@
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
 
 from app.api.player import router as player_router
@@ -10,10 +11,22 @@ from app.api.match_squad import router as match_squad_router
 from app.api.player_of_match import router as player_of_match_router
 from app.api.powerplay import router as powerplay_router
 from app.api.extras_breakdown import router as extras_breakdown_router
+from app.api.analytics.stats import router as analytics_router
+from app.api.scorecard import router as scorecard_router
 
 app = FastAPI(
     title="CricketIQ AI",
     version="1.0.0"
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(player_router)
@@ -26,6 +39,8 @@ app.include_router(match_squad_router)
 app.include_router(player_of_match_router)
 app.include_router(powerplay_router)
 app.include_router(extras_breakdown_router)
+app.include_router(analytics_router)
+app.include_router(scorecard_router)
 
 @app.get("/")
 def home():
