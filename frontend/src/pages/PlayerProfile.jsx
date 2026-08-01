@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+
 import api from "../services/api";
 
 function PlayerProfile() {
@@ -9,7 +10,7 @@ function PlayerProfile() {
 
   useEffect(() => {
     api
-      .get(`/players/${playerId}`)
+      .get(`/players/${playerId}/profile`)
       .then((response) => {
         setPlayer(response.data);
       })
@@ -20,7 +21,7 @@ function PlayerProfile() {
 
   if (!player) {
     return (
-      <div className="text-white text-2xl">
+      <div className="text-2xl text-white">
         Loading...
       </div>
     );
@@ -35,13 +36,55 @@ function PlayerProfile() {
 
       <div className="rounded-xl bg-slate-800 p-8">
 
-        <p className="mb-4 text-xl">
-          <strong>Player Name:</strong> {player.player_name}
-        </p>
+        <h2 className="mb-6 text-3xl font-semibold">
+          {player.player_name}
+        </h2>
 
-        <p className="text-xl">
-          <strong>Player ID:</strong> {player.player_id}
-        </p>
+        <div className="grid gap-4 md:grid-cols-2">
+
+          <div className="rounded-lg bg-slate-700 p-4">
+            <p className="text-gray-300">Player ID</p>
+            <p className="text-xl font-bold">
+              {player.player_id}
+            </p>
+          </div>
+
+          <div className="rounded-lg bg-slate-700 p-4">
+            <p className="text-gray-300">Runs</p>
+            <p className="text-3xl font-bold">
+              {player.runs ?? 0}
+            </p>
+          </div>
+
+          <div className="rounded-lg bg-slate-700 p-4">
+            <p className="text-gray-300">Balls Faced</p>
+            <p className="text-3xl font-bold">
+              {player.balls_faced ?? 0}
+            </p>
+          </div>
+
+          <div className="rounded-lg bg-slate-700 p-4">
+            <p className="text-gray-300">Strike Rate</p>
+            <p className="text-3xl font-bold">
+              {player.strike_rate ?? 0}
+            </p>
+          </div>
+
+          <div className="rounded-lg bg-slate-700 p-4">
+            <p className="text-gray-300">Fours</p>
+            <p className="text-3xl font-bold">
+              {player.fours ?? 0}
+            </p>
+          </div>
+
+          <div className="rounded-lg bg-slate-700 p-4">
+            <p className="text-gray-300">Sixes</p>
+            <p className="text-3xl font-bold">
+              {player.sixes ?? 0}
+            </p>
+          </div>
+
+        </div>
 
       </div>
 

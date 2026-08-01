@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import api from "../services/api";
 import StatsCard from "../components/StatsCard";
+import TopBattersTable from "../components/TopBattersTable";
 
 function Dashboard() {
 
@@ -17,42 +18,23 @@ function Dashboard() {
   return (
     <div className="text-white">
 
-      <h1 className="mb-10 text-5xl font-bold text-white">
+      <h1 className="mb-10 text-5xl font-bold">
         Dashboard
       </h1>
 
       <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
 
-        <StatsCard
-          title="Matches"
-          value={stats.matches}
-        />
+        <StatsCard title="Matches" value={stats.matches} />
+        <StatsCard title="Players" value={stats.players} />
+        <StatsCard title="Teams" value={stats.teams} />
+        <StatsCard title="Venues" value={stats.venues} />
+        <StatsCard title="Deliveries" value={stats.deliveries} />
+        <StatsCard title="Wickets" value={stats.wickets} />
 
-        <StatsCard
-          title="Players"
-          value={stats.players}
-        />
+      </div>
 
-        <StatsCard
-          title="Teams"
-          value={stats.teams}
-        />
-
-        <StatsCard
-          title="Venues"
-          value={stats.venues}
-        />
-
-        <StatsCard
-          title="Deliveries"
-          value={stats.deliveries}
-        />
-
-        <StatsCard
-          title="Wickets"
-          value={stats.wickets}
-        />
-
+      <div className="mt-12">
+        <TopBattersTable />
       </div>
 
     </div>

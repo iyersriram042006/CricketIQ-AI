@@ -7,23 +7,22 @@ from app.db.database import get_db
 router = APIRouter(tags=["Player Profile"])
 
 
-@router.get("/players/{player_id}")
+@router.get("/players/{player_id}/profile")
 def get_player(player_id: str, db: Session = Depends(get_db)):
     query = text("""
-        SELECT
-            p.player_id,
-            p.player_name,
-            ps.matches,
-            ps.runs,
-            ps.balls_faced,
-            ps.fours,
-            ps.sixes,
-            ps.strike_rate
-        FROM players p
-        LEFT JOIN player_stats ps
+    SELECT
+        p.player_id,
+        p.player_name,
+        ps.runs,
+        ps.balls_faced,
+        ps.fours,
+        ps.sixes,
+        ps.strike_rate
+    FROM players p
+    LEFT JOIN player_stats ps
         ON p.player_name = ps.batter
-        WHERE p.player_id = :player_id
-    """)
+    WHERE p.player_id = :player_id
+""")
 
     result = db.execute(query, {"player_id": player_id}).first()
 
