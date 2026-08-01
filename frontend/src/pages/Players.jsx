@@ -36,7 +36,7 @@ function Players() {
   }, [players, search, ascending]);
 
   return (
-    <div className="min-h-screen bg-slate-950 p-8 text-white">
+    <div className="text-white">
       <h1 className="mb-2 text-5xl font-bold">Players</h1>
 
       <p className="mb-6 text-slate-400">

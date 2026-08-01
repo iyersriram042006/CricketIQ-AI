@@ -28,6 +28,8 @@ def get_player(player_id: str, db: Session = Depends(get_db)):
             detail="Player not found"
         )
 
+    return player
+
 @router.get("/players/search/{name}", response_model=list[PlayerResponse])
 def search_player(name: str, db: Session = Depends(get_db)):
 

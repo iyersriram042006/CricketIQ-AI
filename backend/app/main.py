@@ -42,7 +42,7 @@ app.include_router(powerplay_router)
 app.include_router(extras_breakdown_router)
 app.include_router(analytics_router)
 app.include_router(scorecard_router)
-app.include_router(player_profile_router)
+# app.include_router(player_profile_router)
 
 @app.get("/")
 def home():

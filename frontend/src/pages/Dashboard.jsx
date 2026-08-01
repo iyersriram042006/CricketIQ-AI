@@ -15,7 +15,7 @@ function Dashboard() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-950 p-10">
+    <div className="text-white">
 
       <h1 className="mb-10 text-5xl font-bold text-white">
         Dashboard
