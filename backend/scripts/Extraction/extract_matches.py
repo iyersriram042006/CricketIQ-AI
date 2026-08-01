@@ -67,20 +67,25 @@ for filename in json_files:
         team_2 = teams[1]
 
         # Venue and city of the match.
-        venue = data["info"]["venue"]
-        city = data["info"]["city"]
+        venue = data["info"].get("venue", "")
+        city = data["info"].get("city", "")
 
         # Which season this match belongs to.
-        season = data["info"]["season"]
+        season = data["info"].get("season", "")
 
         # Who won the toss, and what they chose to do (bat or field).
-        toss_winner = data["info"]["toss"]["winner"]
-        toss_decision = data["info"]["toss"]["decision"]
+        toss = data["info"].get("toss", {})
+
+        toss_winner = toss.get("winner", "")
+
+        toss_decision = toss.get("decision", "")
 
         # The overall match winner. Some matches (ties/no result) have no
         # winner, so we use .get() with a default value instead of a
         # direct lookup, which would raise an error if the key is missing.
-        match_winner = data["info"]["outcome"].get("winner", "No Result")
+        outcome = data["info"].get("outcome", {})
+
+        match_winner = outcome.get("winner", "No Result")
 
         # If we reach this point, every required field was found successfully.
         # Build a dictionary for this match's row and add it to our list.
