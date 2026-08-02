@@ -1,14 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import api from "../services/api";
 
 function Matches() {
   const [matches, setMatches] = useState([]);
+  const [search, setSearch] = useState("");
+
   const navigate = useNavigate();
 
   useEffect(() => {
-    api.get("/matches")
+    api
+      .get("/matches")
       .then((res) => {
         setMatches(res.data);
       })
@@ -17,6 +20,19 @@ function Matches() {
       });
   }, []);
 
+  const filteredMatches = useMemo(() => {
+    const query = search.toLowerCase();
+
+    return matches.filter((match) => {
+      return (
+        match.team_1.toLowerCase().includes(query) ||
+        match.team_2.toLowerCase().includes(query) ||
+        match.venue.toLowerCase().includes(query) ||
+        String(match.season).includes(query)
+      );
+    });
+  }, [matches, search]);
+
   return (
     <div className="text-white">
 
@@ -24,14 +40,26 @@ function Matches() {
         Matches
       </h1>
 
+      <input
+        type="text"
+        placeholder="Search by team, venue or season..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="mb-8 w-full rounded-xl bg-slate-800 p-4 text-white outline-none"
+      />
+
+      <p className="mb-6 text-slate-400">
+        Total Matches: {filteredMatches.length}
+      </p>
+
       <div className="space-y-4">
 
-        {matches.map((match) => (
+        {filteredMatches.map((match) => (
 
           <div
             key={match.match_id}
-            className="rounded-xl bg-slate-800 p-6 hover:bg-slate-700 transition cursor-pointer"
             onClick={() => navigate(`/matches/${match.match_id}`)}
+            className="cursor-pointer rounded-xl bg-slate-800 p-6 transition hover:bg-slate-700"
           >
 
             <h2 className="text-2xl font-bold">
@@ -39,15 +67,15 @@ function Matches() {
             </h2>
 
             <p className="mt-2 text-slate-300">
-              Season: {match.season}
+              <strong>Season:</strong> {match.season}
             </p>
 
             <p className="text-slate-300">
-              Venue: {match.venue}
+              <strong>Venue:</strong> {match.venue}
             </p>
 
             <p className="text-slate-300">
-              Winner: {match.match_winner}
+              <strong>Winner:</strong> {match.match_winner}
             </p>
 
           </div>

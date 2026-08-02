@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import api from "../services/api";
 import StatsCard from "../components/StatsCard";
 import TopBattersTable from "../components/TopBattersTable";
+import TopBowlersTable from "../components/TopBowlersTable";
+import TopTeamsTable from "../components/TopTeamsTable";
 
 function Dashboard() {
 
@@ -33,8 +35,16 @@ function Dashboard() {
 
       </div>
 
-      <div className="mt-12">
+      <div className="mt-12 grid gap-8 xl:grid-cols-2">
+
         <TopBattersTable />
+
+        <TopBowlersTable />
+
+      </div>
+
+      <div className="mt-8">
+        <TopTeamsTable />
       </div>
 
     </div>

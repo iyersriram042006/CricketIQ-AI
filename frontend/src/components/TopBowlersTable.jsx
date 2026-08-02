@@ -22,12 +22,13 @@ function TopBowlersTable() {
       <table className="w-full">
 
         <thead>
-          <tr className="border-b border-gray-700">
-            <th className="py-3 text-left">#</th>
-            <th className="text-left">Bowler</th>
-            <th className="text-right">Wickets</th>
-          </tr>
-        </thead>
+            <tr className="border-b border-gray-700">
+              <th className="py-3 text-left">#</th>
+              <th className="text-left">Bowler</th>
+              <th className="text-right">Matches</th>
+              <th className="text-right">Wickets</th>
+            </tr>
+          </thead>
 
         <tbody>
 
@@ -41,6 +42,10 @@ function TopBowlersTable() {
               <td className="py-3">{index + 1}</td>
 
               <td>{bowler.bowler}</td>
+
+              <td className="text-right">
+                {bowler.matches}
+              </td>
 
               <td className="text-right">
                 {bowler.wickets}

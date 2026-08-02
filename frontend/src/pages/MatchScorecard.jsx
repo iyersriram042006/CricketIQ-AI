@@ -21,7 +21,7 @@ function MatchScorecard() {
 
   if (!scorecard) {
     return (
-      <div className="text-white text-2xl">
+      <div className="text-2xl text-white">
         Loading...
       </div>
     );
@@ -41,96 +41,129 @@ function MatchScorecard() {
         </h2>
 
         <p className="mt-2">
-          Winner: {scorecard.match.match_winner}
+          <strong>Winner:</strong> {scorecard.match.match_winner}
         </p>
 
         <p>
-          Venue: {scorecard.match.venue}
+          <strong>Venue:</strong> {scorecard.match.venue}
         </p>
 
         <p>
-          Season: {scorecard.match.season}
+          <strong>Season:</strong> {scorecard.match.season}
         </p>
 
       </div>
 
-      <div className="rounded-xl bg-slate-800 p-6">
+      {scorecard.innings.map((inning) => (
 
-        <h2 className="mb-5 text-3xl font-bold">
-          Batting Scorecard
-        </h2>
+        <div
+          key={inning.innings_number}
+          className="mb-10 rounded-xl bg-slate-800 p-6"
+        >
 
-        <table className="w-full">
+          <h2 className="text-3xl font-bold">
+            {inning.batting_team}
+          </h2>
 
-          <thead>
+          <p className="mb-6 mt-2 text-xl text-slate-300">
+            {inning.runs}/{inning.wickets} ({inning.overs} overs)
+          </p>
 
-            <tr className="border-b border-slate-700">
-              <th className="py-3 text-left">Batter</th>
-              <th>Runs</th>
-              <th>Balls</th>
-            </tr>
+          <h3 className="mb-4 text-2xl font-semibold">
+            Batting
+          </h3>
 
-          </thead>
+          <table className="mb-8 w-full">
 
-          <tbody>
+            <thead>
 
-            {scorecard.batting.map((player) => (
-
-              <tr
-                key={player.batter}
-                className="border-b border-slate-700"
-              >
-                <td className="py-3">{player.batter}</td>
-                <td>{player.runs}</td>
-                <td>{player.balls}</td>
+              <tr className="border-b border-slate-700">
+                <th className="py-3 text-left">Batter</th>
+                <th>Runs</th>
+                <th>Balls</th>
               </tr>
 
-            ))}
+            </thead>
 
-          </tbody>
+            <tbody>
 
-        </table>
+              {scorecard.batting
+                .filter(
+                  (player) =>
+                    player.innings_number === inning.innings_number
+                )
+                .map((player) => (
 
-      </div>
+                  <tr
+                    key={`${inning.innings_number}-${player.batter}`}
+                    className="border-b border-slate-700"
+                  >
+                    <td className="py-3">
+                      {player.batter}
+                    </td>
 
-      <div className="mt-10 rounded-xl bg-slate-800 p-6">
+                    <td>{player.runs}</td>
 
-        <h2 className="mb-5 text-3xl font-bold">
-          Wickets
-        </h2>
+                    <td>{player.balls}</td>
+                  </tr>
 
-        <table className="w-full">
+                ))}
 
-          <thead>
+            </tbody>
 
-            <tr className="border-b border-slate-700">
-              <th className="py-3 text-left">Batter Out</th>
-              <th>Bowler</th>
-              <th>Dismissal</th>
-            </tr>
+          </table>
 
-          </thead>
+          <h3 className="mb-4 text-2xl font-semibold">
+            Wickets
+          </h3>
 
-          <tbody>
+          <table className="w-full">
 
-            {scorecard.wickets.map((wicket, index) => (
+            <thead>
 
-              <tr
-                key={index}
-                className="border-b border-slate-700"
-              >
-                <td className="py-3">{wicket.batter_out}</td>
-                <td>{wicket.bowler}</td>
-                <td>{wicket.kind_of_wicket}</td>
+              <tr className="border-b border-slate-700">
+                <th className="py-3 text-left">
+                  Batter Out
+                </th>
+
+                <th>Bowler</th>
+
+                <th>Dismissal</th>
               </tr>
 
-            ))}
+            </thead>
 
-          </tbody>
+            <tbody>
 
-        </table>
+              {scorecard.wickets
+                .filter(
+                  (wicket) =>
+                    wicket.innings_number === inning.innings_number
+                )
+                .map((wicket, index) => (
 
-      </div>
+                  <tr
+                    key={`${inning.innings_number}-${index}`}
+                    className="border-b border-slate-700"
+                  >
+                    <td className="py-3">
+                      {wicket.batter_out}
+                    </td>
+
+                    <td>{wicket.bowler}</td>
+
+                    <td>{wicket.kind_of_wicket}</td>
+                  </tr>
+
+                ))}
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      ))}
 
     </div>
   );
