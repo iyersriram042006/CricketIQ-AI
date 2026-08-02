@@ -53,6 +53,25 @@ def home():
         "message": "Welcome to CricketIQ AI 🚀"
     }
 
+from sqlalchemy import text
+from app.db.database import engine
+
+@app.get("/debug-db")
+def debug_db():
+    with engine.connect() as conn:
+        db = conn.execute(text("SELECT current_database()")).scalar()
+
+        tables = conn.execute(text("""
+            SELECT tablename
+            FROM pg_tables
+            WHERE schemaname='public'
+        """)).fetchall()
+
+        return {
+            "database": db,
+            "tables": [t[0] for t in tables]
+        }
+
 import os
 
 @app.get("/debug-db")
