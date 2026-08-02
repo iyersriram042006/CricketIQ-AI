@@ -1,31 +1,21 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
+import PlayerSearch from "../components/PlayerSearch";
 
 function PlayerComparison() {
-  const [allPlayers, setAllPlayers] = useState([]);
-
   const [player1, setPlayer1] = useState("");
   const [player2, setPlayer2] = useState("");
 
   const [players, setPlayers] = useState([]);
 
   useEffect(() => {
-    api
-      .get("/players")
-      .then((res) => {
-        setAllPlayers(res.data);
-
-        if (res.data.length >= 2) {
-          setPlayer1(res.data[0].player_id);
-          setPlayer2(res.data[1].player_id);
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+    setPlayer1("");
+    setPlayer2("");
   }, []);
 
   const comparePlayers = () => {
+    if (!player1 || !player2) return;
+
     api
       .get("/player-comparison", {
         params: {
@@ -50,39 +40,18 @@ function PlayerComparison() {
 
       <div className="mb-8 grid gap-4 md:grid-cols-3">
 
-        <select
-          className="rounded-lg bg-slate-800 p-3"
-          value={player1}
-          onChange={(e) => setPlayer1(e.target.value)}
-        >
-          {allPlayers.map((player) => (
-            <option
-              key={player.player_id}
-              value={player.player_id}
-            >
-              {player.player_name}
-            </option>
-          ))}
-        </select>
+        <PlayerSearch
+          onSelect={setPlayer1}
+        />
 
-        <select
-          className="rounded-lg bg-slate-800 p-3"
-          value={player2}
-          onChange={(e) => setPlayer2(e.target.value)}
-        >
-          {allPlayers.map((player) => (
-            <option
-              key={player.player_id}
-              value={player.player_id}
-            >
-              {player.player_name}
-            </option>
-          ))}
-        </select>
+        <PlayerSearch
+          onSelect={setPlayer2}
+        />
 
         <button
           onClick={comparePlayers}
-          className="rounded-lg bg-blue-600 px-6 py-3 hover:bg-blue-700"
+          disabled={!player1 || !player2}
+          className="rounded-lg bg-blue-600 px-6 py-3 hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-600"
         >
           Compare
         </button>
