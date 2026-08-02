@@ -9,17 +9,11 @@ function TeamTable({ teams }) {
       <table className="min-w-full">
 
         <thead className="bg-slate-800">
-
           <tr>
             <th className="px-6 py-4 text-left">
-              Team ID
-            </th>
-
-            <th className="px-6 py-4 text-left">
-              Team Name
+              Team
             </th>
           </tr>
-
         </thead>
 
         <tbody>
@@ -33,10 +27,6 @@ function TeamTable({ teams }) {
               }
               className="cursor-pointer border-t border-slate-700 hover:bg-slate-800"
             >
-
-              <td className="px-6 py-4">
-                {team.team_id}
-              </td>
 
               <td className="px-6 py-4">
                 {team.team_name}

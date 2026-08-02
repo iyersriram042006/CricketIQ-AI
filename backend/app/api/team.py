@@ -26,6 +26,31 @@ def get_teams(db: Session = Depends(get_db)):
 
     return result
 
+from fastapi import Query
+
+
+@router.get("/teams/search")
+def search_teams(
+    q: str = Query(..., min_length=1),
+    db: Session = Depends(get_db),
+):
+    query = text("""
+        SELECT DISTINCT
+            canonical_name AS team_name
+        FROM team_aliases
+        WHERE canonical_name ILIKE :search
+        ORDER BY canonical_name
+        LIMIT 10
+    """)
+
+    result = db.execute(
+        query,
+        {
+            "search": f"%{q}%"
+        },
+    ).mappings().all()
+
+    return result
 
 # ===========================
 # TEAM COMPARISON

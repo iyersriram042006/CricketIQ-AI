@@ -1,31 +1,16 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import api from "../services/api";
+import TeamSearch from "../components/TeamSearch";
 
 function TeamComparison() {
-  const [teams, setTeams] = useState([]);
-
   const [team1, setTeam1] = useState("");
   const [team2, setTeam2] = useState("");
 
   const [result, setResult] = useState(null);
 
-  useEffect(() => {
-    api
-      .get("/teams")
-      .then((res) => {
-        setTeams(res.data);
-
-        if (res.data.length >= 2) {
-          setTeam1(res.data[0].team_name);
-          setTeam2(res.data[1].team_name);
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  }, []);
-
   const compareTeams = () => {
+    if (!team1 || !team2) return;
+
     api
       .get("/teams/compare", {
         params: {
@@ -50,39 +35,18 @@ function TeamComparison() {
 
       <div className="mb-8 grid gap-4 md:grid-cols-3">
 
-        <select
-          className="rounded-lg bg-slate-800 p-3"
-          value={team1}
-          onChange={(e) => setTeam1(e.target.value)}
-        >
-          {teams.map((team) => (
-            <option
-              key={team.team_id}
-              value={team.team_name}
-            >
-              {team.team_name}
-            </option>
-          ))}
-        </select>
+        <TeamSearch
+          onSelect={setTeam1}
+        />
 
-        <select
-          className="rounded-lg bg-slate-800 p-3"
-          value={team2}
-          onChange={(e) => setTeam2(e.target.value)}
-        >
-          {teams.map((team) => (
-            <option
-              key={team.team_id}
-              value={team.team_name}
-            >
-              {team.team_name}
-            </option>
-          ))}
-        </select>
+        <TeamSearch
+          onSelect={setTeam2}
+        />
 
         <button
           onClick={compareTeams}
-          className="rounded-lg bg-blue-600 px-6 py-3 hover:bg-blue-700"
+          disabled={!team1 || !team2}
+          className="rounded-lg bg-blue-600 px-6 py-3 hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-600"
         >
           Compare
         </button>
