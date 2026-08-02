@@ -9,9 +9,22 @@ from app.schemas.team import TeamResponse
 router = APIRouter()
 
 
-@router.get("/teams", response_model=list[TeamResponse])
+@router.get("/teams")
 def get_teams(db: Session = Depends(get_db)):
-    return db.query(Team).all()
+    query = text("""
+        SELECT
+            MIN(team_id) AS team_id,
+            canonical_name AS team_name
+        FROM team_aliases
+        JOIN teams
+            ON team_aliases.original_name = teams.team_name
+        GROUP BY canonical_name
+        ORDER BY canonical_name
+    """)
+
+    result = db.execute(query).mappings().all()
+
+    return result
 
 
 # ===========================
