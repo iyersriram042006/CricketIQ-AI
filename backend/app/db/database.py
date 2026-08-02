@@ -50,6 +50,22 @@ if DATABASE_URL is None:
 # SQLAlchemy sends to PostgreSQL in your terminal.
 engine = create_engine(DATABASE_URL, echo=False)
 
+from sqlalchemy import text
+
+try:
+    with engine.connect() as conn:
+        print("===================================")
+        print("DATABASE:", conn.execute(text("SELECT current_database()")).scalar())
+        print("SCHEMA:", conn.execute(text("SELECT current_schema()")).scalar())
+        print("TABLES:", conn.execute(text("""
+            SELECT tablename
+            FROM pg_tables
+            WHERE schemaname='public'
+        """)).fetchall())
+        print("===================================")
+except Exception as e:
+    print("DATABASE ERROR:", e)
+
 # ---------------------------------------------------------------------
 # STEP 4: Create a session factory
 # ---------------------------------------------------------------------
