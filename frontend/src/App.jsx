@@ -7,6 +7,7 @@ import Players from "./pages/Players";
 import Matches from "./pages/Matches";
 import Analytics from "./pages/Analytics";
 import PlayerProfile from "./pages/PlayerProfile";
+import MatchScorecard from "./pages/MatchScorecard";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/players/:playerId" element={<PlayerProfile />} />
           <Route path="/matches" element={<Matches />} />
           <Route path="/analytics" element={<Analytics />} />
+          <Route path="/matches/:matchId" element={<MatchScorecard />} />
         </Routes>
       </Layout>
     </BrowserRouter>
