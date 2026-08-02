@@ -73,11 +73,13 @@ def dashboard(db: Session = Depends(get_db)):
 def top_teams(db: Session = Depends(get_db)):
     query = text("""
         SELECT
-            match_winner AS team,
+            ta.canonical_name AS team,
             COUNT(*) AS wins
-        FROM matches
-        WHERE match_winner IS NOT NULL
-        GROUP BY match_winner
+        FROM matches m
+        JOIN team_aliases ta
+            ON m.match_winner = ta.original_name
+        WHERE m.match_winner IS NOT NULL
+        GROUP BY ta.canonical_name
         ORDER BY wins DESC
         LIMIT 10
     """)
