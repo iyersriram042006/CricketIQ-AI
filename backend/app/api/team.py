@@ -31,29 +31,38 @@ def compare_teams(
 
             SUM(
                 CASE
-                    WHEN match_winner = :team1 THEN 1
+                    WHEN ta3.canonical_name = :team1 THEN 1
                     ELSE 0
                 END
             ) AS team1_wins,
 
             SUM(
                 CASE
-                    WHEN match_winner = :team2 THEN 1
+                    WHEN ta3.canonical_name = :team2 THEN 1
                     ELSE 0
                 END
             ) AS team2_wins
 
-        FROM matches
+        FROM matches m
+
+        JOIN team_aliases ta1
+            ON m.team_1 = ta1.original_name
+
+        JOIN team_aliases ta2
+            ON m.team_2 = ta2.original_name
+
+        LEFT JOIN team_aliases ta3
+            ON m.match_winner = ta3.original_name
 
         WHERE
         (
-            team_1 = :team1
-            AND team_2 = :team2
+            ta1.canonical_name = :team1
+            AND ta2.canonical_name = :team2
         )
         OR
         (
-            team_1 = :team2
-            AND team_2 = :team1
+            ta1.canonical_name = :team2
+            AND ta2.canonical_name = :team1
         )
     """)
 
@@ -76,11 +85,11 @@ def compare_teams(
 def get_team(team_name: str, db: Session = Depends(get_db)):
     query = text("""
         SELECT
-            team_name,
+            ta.canonical_name AS team_name,
             COUNT(*) AS matches,
             SUM(
                 CASE
-                    WHEN match_winner = team_name THEN 1
+                    WHEN ta2.canonical_name = ta.canonical_name THEN 1
                     ELSE 0
                 END
             ) AS wins
@@ -93,8 +102,16 @@ def get_team(team_name: str, db: Session = Depends(get_db)):
             SELECT team_2 AS team_name, match_winner
             FROM matches
         ) t
-        WHERE team_name = :team_name
-        GROUP BY team_name
+
+        JOIN team_aliases ta
+            ON t.team_name = ta.original_name
+
+        LEFT JOIN team_aliases ta2
+            ON t.match_winner = ta2.original_name
+
+        WHERE ta.canonical_name = :team_name
+
+        GROUP BY ta.canonical_name
     """)
 
     result = db.execute(
@@ -116,11 +133,13 @@ def get_team(team_name: str, db: Session = Depends(get_db)):
 def get_team_stats(team_name: str, db: Session = Depends(get_db)):
     query = text("""
         SELECT
-            batter,
-            SUM(batter_runs) AS runs
-        FROM deliveries
-        WHERE batting_team = :team_name
-        GROUP BY batter
+            d.batter,
+            SUM(d.batter_runs) AS runs
+        FROM deliveries d
+        JOIN team_aliases ta
+            ON d.batting_team = ta.original_name
+        WHERE ta.canonical_name = :team_name
+        GROUP BY d.batter
         ORDER BY runs DESC
         LIMIT 5
     """)
@@ -144,23 +163,35 @@ def get_team_bowlers(team_name: str, db: Session = Depends(get_db)):
             w.bowler,
             COUNT(*) AS wickets
         FROM wickets w
+
         JOIN matches m
             ON w.match_id = m.match_id
+
+        JOIN team_aliases ta1
+            ON m.team_1 = ta1.original_name
+
+        JOIN team_aliases ta2
+            ON m.team_2 = ta2.original_name
+
+        JOIN team_aliases ta3
+            ON w.batting_team = ta3.original_name
+
         WHERE
-            (
-                m.team_1 = :team_name
-                OR
-                m.team_2 = :team_name
-            )
-            AND
-            w.batting_team <> :team_name
-            AND
-            w.kind_of_wicket NOT IN (
-                'run out',
-                'retired hurt',
-                'retired out',
-                'obstructing the field'
-            )
+        (
+            ta1.canonical_name = :team_name
+            OR
+            ta2.canonical_name = :team_name
+        )
+
+        AND ta3.canonical_name <> :team_name
+
+        AND w.kind_of_wicket NOT IN (
+            'run out',
+            'retired hurt',
+            'retired out',
+            'obstructing the field'
+        )
+
         GROUP BY w.bowler
         ORDER BY wickets DESC
         LIMIT 5
