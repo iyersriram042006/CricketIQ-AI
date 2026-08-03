@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import TEAM_LOGOS from "../utils/teamLogos";
 
 function TeamTable({ teams }) {
   const navigate = useNavigate();
@@ -29,7 +30,21 @@ function TeamTable({ teams }) {
             >
 
               <td className="px-6 py-4">
-                {team.team_name}
+
+                <div className="flex items-center gap-4">
+
+                  <img
+                    src={TEAM_LOGOS[team.team_name]}
+                    alt={team.team_name}
+                    className="h-10 w-10 object-contain"
+                  />
+
+                  <span className="font-medium">
+                    {team.team_name}
+                  </span>
+
+                </div>
+
               </td>
 
             </tr>
@@ -44,4 +59,4 @@ function TeamTable({ teams }) {
   );
 }
 
-export default TeamTable;
+export default TeamTable; 

@@ -44,6 +44,12 @@ def top_bowlers(db: Session = Depends(get_db)):
            AND w.innings_number = d.innings_number
            AND w.over_number = d.over_number
            AND w.ball_number = d.ball_number
+        WHERE w.kind_of_wicket NOT IN (
+            'run out',
+            'retired hurt',
+            'retired out',
+            'obstructing the field'
+        )
         GROUP BY w.bowler
         ORDER BY wickets DESC
         LIMIT 10
@@ -59,7 +65,10 @@ def dashboard(db: Session = Depends(get_db)):
         SELECT
             (SELECT COUNT(*) FROM matches) AS matches,
             (SELECT COUNT(*) FROM players) AS players,
-            (SELECT COUNT(*) FROM teams) AS teams,
+            (
+                SELECT COUNT(DISTINCT canonical_name)
+                FROM team_aliases
+            ) AS teams,
             (SELECT COUNT(*) FROM venues) AS venues,
             (SELECT COUNT(*) FROM deliveries) AS deliveries,
             (SELECT COUNT(*) FROM wickets) AS wickets

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
+import TEAM_LOGOS from "../utils/teamLogos";  
 
 function TopTeamsTable() {
   const [teams, setTeams] = useState([]);
@@ -48,7 +49,21 @@ function TopTeamsTable() {
               </td>
 
               <td>
-                {team.team}
+
+                <div className="flex items-center gap-3">
+
+                  <img
+                    src={TEAM_LOGOS[team.team]}
+                    alt={team.team}
+                    className="h-8 w-8 object-contain"
+                  />
+
+                  <span>
+                    {team.team}
+                  </span>
+
+                </div>
+
               </td>
 
               <td className="text-right">

@@ -123,14 +123,68 @@ def compare_teams(
 def get_team(team_name: str, db: Session = Depends(get_db)):
     query = text("""
         SELECT
-            ta.canonical_name AS team_name,
-            COUNT(*) AS matches,
+        ta.canonical_name AS team_name,
+
+        COUNT(*) AS matches,
+
+        SUM(
+            CASE
+                WHEN ta2.canonical_name = ta.canonical_name THEN 1
+                ELSE 0
+            END
+        ) AS wins,
+
+        ROUND(
+            100.0 *
             SUM(
                 CASE
                     WHEN ta2.canonical_name = ta.canonical_name THEN 1
                     ELSE 0
                 END
-            ) AS wins
+            ) /
+            COUNT(*),
+            2
+        ) AS win_percentage,
+        (
+            SELECT MAX(team_runs)
+            FROM (
+                SELECT
+                    d.match_id,
+                    d.innings_number,
+                    SUM(d.total_runs) AS team_runs
+                FROM deliveries d
+
+                JOIN team_aliases ta4
+                    ON d.batting_team = ta4.original_name
+
+                WHERE ta4.canonical_name = :team_name
+                AND d.innings_number <= 2
+
+                GROUP BY
+                    d.match_id,
+                    d.innings_number
+            ) scores
+        ) AS highest_score,
+        (
+            SELECT MIN(team_runs)
+            FROM (
+                SELECT
+                    d.match_id,
+                    d.innings_number,
+                    SUM(d.total_runs) AS team_runs
+                FROM deliveries d
+
+                JOIN team_aliases ta5
+                    ON d.batting_team = ta5.original_name
+
+                WHERE ta5.canonical_name = :team_name
+                AND d.innings_number <= 2
+
+                GROUP BY
+                    d.match_id,
+                    d.innings_number
+            ) scores
+        ) AS lowest_score
         FROM (
             SELECT team_1 AS team_name, match_winner
             FROM matches
@@ -239,5 +293,109 @@ def get_team_bowlers(team_name: str, db: Session = Depends(get_db)):
         query,
         {"team_name": team_name},
     ).mappings().all()
+
+    return result
+
+# ===========================
+# TEAM RECENT FORM
+# ===========================
+
+@router.get("/teams/{team_name}/recent-form")
+def get_team_recent_form(
+    team_name: str,
+    db: Session = Depends(get_db),
+):
+    query = text("""
+        SELECT
+            m.season,
+
+            CASE
+                WHEN ta1.canonical_name = :team_name
+                THEN ta2.canonical_name
+                ELSE ta1.canonical_name
+            END AS opponent,
+
+            CASE
+                WHEN taw.canonical_name = :team_name
+                THEN 'W'
+                ELSE 'L'
+            END AS result
+
+        FROM matches m
+
+        JOIN team_aliases ta1
+            ON m.team_1 = ta1.original_name
+
+        JOIN team_aliases ta2
+            ON m.team_2 = ta2.original_name
+
+        LEFT JOIN team_aliases taw
+            ON m.match_winner = taw.original_name
+
+        WHERE
+            ta1.canonical_name = :team_name
+            OR
+            ta2.canonical_name = :team_name
+
+        ORDER BY
+            m.match_id DESC
+
+        LIMIT 5
+    """)
+
+    result = db.execute(
+        query,
+        {
+            "team_name": team_name,
+        },
+    ).mappings().all()
+
+    return result
+
+# ===========================
+# TEAM RECORDS
+# ===========================
+
+@router.get("/teams/{team_name}/records")
+def get_team_records(
+    team_name: str,
+    db: Session = Depends(get_db),
+):
+    query = text("""
+        SELECT
+            MAX(chase_score) AS highest_successful_chase
+
+        FROM (
+            SELECT
+                m.match_id,
+                SUM(d.total_runs) AS chase_score
+
+            FROM matches m
+
+            JOIN deliveries d
+                ON m.match_id = d.match_id
+
+            JOIN team_aliases ta
+                ON d.batting_team = ta.original_name
+
+            JOIN team_aliases tw
+                ON m.match_winner = tw.original_name
+
+            WHERE
+                ta.canonical_name = :team_name
+                AND tw.canonical_name = :team_name
+                AND d.innings_number = 2
+
+            GROUP BY
+                m.match_id
+        ) chase_scores
+    """)
+
+    result = db.execute(
+        query,
+        {
+            "team_name": team_name,
+        },
+    ).mappings().first()
 
     return result

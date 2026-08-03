@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-
+import TEAM_LOGOS from "../utils/teamLogos";
 import api from "../services/api";
 
 function TeamProfile() {
@@ -9,6 +9,7 @@ function TeamProfile() {
   const [team, setTeam] = useState(null);
   const [topBatters, setTopBatters] = useState([]);
   const [topBowlers, setTopBowlers] = useState([]);
+  const [recentForm, setRecentForm] = useState([]);
 
   useEffect(() => {
     api
@@ -38,6 +39,15 @@ function TeamProfile() {
         console.error(err);
       });
 
+    api
+      .get(`/teams/${teamName}/recent-form`)
+      .then((res) => {
+        setRecentForm(res.data);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+
   }, [teamName]);
 
   if (!team) {
@@ -50,9 +60,6 @@ function TeamProfile() {
 
   const losses = team.matches - team.wins;
 
-  const winPercentage =
-    ((team.wins / team.matches) * 100).toFixed(2);
-
   return (
     <div className="text-white">
 
@@ -62,11 +69,21 @@ function TeamProfile() {
 
       <div className="rounded-xl bg-slate-800 p-8">
 
-        <h2 className="mb-6 text-3xl font-semibold">
+        <div className="mb-6 flex items-center gap-4">
+
+        <img
+          src={TEAM_LOGOS[team.team_name]}
+          alt={team.team_name}
+          className="h-16 w-16 object-contain"
+        />
+
+        <h2 className="text-3xl font-semibold">
           {team.team_name}
         </h2>
 
-        <div className="grid gap-4 md:grid-cols-2">
+      </div>
+
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 
           <div className="rounded-lg bg-slate-700 p-4">
             <p className="text-slate-300">
@@ -104,8 +121,55 @@ function TeamProfile() {
             </p>
 
             <p className="text-3xl font-bold">
-              {winPercentage}%
+              {team.win_percentage}%
             </p>
+          </div>
+
+          <div className="rounded-lg bg-slate-700 p-4">
+            <p className="text-slate-300">
+              Highest Score
+            </p>
+
+            <p className="text-3xl font-bold">
+              {team.highest_score}
+            </p>
+          </div>
+
+          <div className="rounded-lg bg-slate-700 p-4">
+            <p className="text-slate-300">
+              Lowest Score
+            </p>
+
+            <p className="text-3xl font-bold">
+              {team.lowest_score}
+            </p>
+          </div>
+
+        </div>
+
+        <div className="mt-10">
+
+          <h3 className="mb-5 text-2xl font-bold">
+            Recent Form
+          </h3>
+
+          <div className="flex gap-3">
+
+            {recentForm.map((match, index) => (
+
+              <div
+                key={index}
+                className={`flex h-12 w-12 items-center justify-center rounded-full text-lg font-bold text-white ${
+                  match.result === "W"
+                    ? "bg-green-600"
+                    : "bg-red-600"
+                }`}
+              >
+                {match.result}
+              </div>
+
+            ))}
+
           </div>
 
         </div>

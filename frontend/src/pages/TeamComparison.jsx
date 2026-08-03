@@ -1,11 +1,12 @@
 import { useState } from "react";
+
 import api from "../services/api";
 import TeamSearch from "../components/TeamSearch";
+import TEAM_LOGOS from "../utils/teamLogos";
 
 function TeamComparison() {
   const [team1, setTeam1] = useState("");
   const [team2, setTeam2] = useState("");
-
   const [result, setResult] = useState(null);
 
   const compareTeams = () => {
@@ -57,7 +58,43 @@ function TeamComparison() {
 
         <div className="rounded-xl bg-slate-800 p-8">
 
-          <h2 className="mb-6 text-3xl font-bold">
+          <div className="mb-10 flex items-center justify-center gap-12">
+
+            <div className="flex flex-col items-center">
+
+              <img
+                src={TEAM_LOGOS[team1]}
+                alt={team1}
+                className="mb-3 h-20 w-20 object-contain"
+              />
+
+              <p className="text-center text-lg font-semibold">
+                {team1}
+              </p>
+
+            </div>
+
+            <div className="text-4xl font-bold text-slate-400">
+              VS
+            </div>
+
+            <div className="flex flex-col items-center">
+
+              <img
+                src={TEAM_LOGOS[team2]}
+                alt={team2}
+                className="mb-3 h-20 w-20 object-contain"
+              />
+
+              <p className="text-center text-lg font-semibold">
+                {team2}
+              </p>
+
+            </div>
+
+          </div>
+
+          <h2 className="mb-6 text-center text-3xl font-bold">
             Head to Head
           </h2>
 
