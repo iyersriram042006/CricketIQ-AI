@@ -64,13 +64,28 @@ def dashboard(db: Session = Depends(get_db)):
     query = text("""
         SELECT
             (SELECT COUNT(*) FROM matches) AS matches,
+
             (SELECT COUNT(*) FROM players) AS players,
+
             (
                 SELECT COUNT(DISTINCT canonical_name)
                 FROM team_aliases
             ) AS teams,
-            (SELECT COUNT(*) FROM venues) AS venues,
+
+            (
+                SELECT COUNT(
+                    DISTINCT COALESCE(
+                        va.canonical_name,
+                        m.venue
+                    )
+                )
+                FROM matches m
+                LEFT JOIN venue_aliases va
+                    ON m.venue = va.original_name
+            ) AS venues,
+
             (SELECT COUNT(*) FROM deliveries) AS deliveries,
+
             (SELECT COUNT(*) FROM wickets) AS wickets
     """)
 
